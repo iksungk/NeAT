@@ -1,0 +1,84 @@
+metadata_version: 1
+name: Adaptive optical correction for in vivo two-photon fluorescence microscopy with
+  neural fields
+description: "This repository contains the code for Neural fields for Adaptive Optical
+  Two-photon Fluorescence Microscopy (NeAT). NeAT operates in three stages:\n\n1.
+  **Aberration and structural estimation**  \n   From a single 3D image stack, NeAT
+  estimates system or sample aberrations and recovers the underlying structural information,
+  without any external training data.\n\n2. **Conjugation error correction**  \n   NeAT
+  estimates and corrects conjugation errors in the imaging system, typically caused
+  by incomplete conjugation or alignment errors.\n\n3. **Sample motion correction**
+  \ \n   NeAT maintains performance even with sample motion during the acquisition
+  of the 3D input stack, by adaptively registering and correcting slice-to-slice motion
+  artifacts.\n\n---\n\n### Code overview\n\nThis capsule includes three main scripts:\n\n####
+  `neat_learning.py`  \nCore routine that takes a 3D image stack as input and outputs
+  aberration and structural estimations. Key physical parameters can be set via command-line
+  arguments (a full list of tunable options is in the `args` parser):\n\n- `psf_dx,
+  psf_dy, psf_dz`: pixel sizes (µm) along $x$, $y$, $z$ axes  \n- `cnts`: center coordinates
+  of the input stack  \n- `dims`: dimensions of the input stack  \n- `na_exc`: excitation
+  numerical aperture (NA)  \n- `sample_motion`: Boolean parameter for sample motion
+  correction. True if sample motion correction is performed.\n\n**Expected outputs:**
+  \ \n- **`rec.h5`** — HDF5 file containing:  \n  - `out_x_m`: estimated structure
+  \ \n  - `out_k_m`: estimated PSF  \n  - `out_y`: computed image stack  \n  - `wf`:
+  Zernike coefficients  \n  - `loss_list`: losses per epoch  \n  - `y`: normalized
+  input stack  \n  - `y_min`, `y_max`: normalization bounds  \n- **`est_aber_map.bmp`**
+  — bitmap of the estimated aberration map from `wf` (unit: waves)\n- **`slm_pattern.bmp`**
+  — 8-bit grayscale image (with a pixel value of 255 corresponding to 1 wave) that
+  is the wrapped corrective phase pattern to be applied to an SLM for aberration correction,
+  if needed.\n\nFeel free to explore the code and adjust parameters to suit your imaging
+  setup.\n\n#### `neat_conj_est.py`\n\nThis script estimates conjugation errors that
+  may be present in a two-photon imaging system. It should be run after `neat_learning.py`
+  on six image stacks. For testing, example stacks acquired using a microscope at
+  UC Berkeley are available under `/commercial_beads_zeros/`, `/commercial_beads_mode4/`,
+  `/commercial_beads_mode6/`, … and `/commercial_beads_mode13/`. Users should acquire
+  these image stacks using their own system to estimate conjugation errors specific
+  to their microscope. To acquire these stacks, users need to display on the SLM images
+  corresponding to a flat phase pattern and five different Zernike modes for calibration
+  (modes 4, 6, ..., 13), respectively. These patterns are available in `/slm_patterns_for_calibration/`
+  as `k_vis_zeros.bmp`, `k_vis_mode4.bmp`, `k_vis_mode6.bmp`, ..., `k_vis_mode13.bmp.`
+  (To apply these patterns directly on a SLM, the SLM needs to be calibrated so that
+  a pixel value of 255 corresponds to 1 wave. The patterns can also be scaled and
+  formatted for a deformable mirror.) Conjugation errors are computed as an affine
+  transformation $\\hat{H}$, from the reconstructions of these stacks and saved to
+  `H.h5`.\n\n#### `neat_conj_corr.py`\n\nThis script compensates for the conjugation
+  errors estimated by `neat_conj_est.py` by applying the inverse affine transformation
+  $\\hat{H}^{-1}$ to an SLM pattern (generated as `slm_pattern.bmp` by `neat_learning.py`,
+  which does not include conjugation error correction). The corrected pattern is saved
+  as `k_vis_(args.dataset)_with_H.bmp`.\n\n> **Note:** If you are using a microscope
+  with perfect conjugation and alignment, you can skip `neat_conj_est.py` and `neat_conj_corr.py`.\n\n---\n\n###
+  Running the Capsule\n\nThis capsule demonstrates NeAT’s application on both custom-built
+  and commercial microscopes:\n\n1. **Microscope with perfect conjugation and alignment**
+  \ \n   Run NeAT on a fixed mouse-brain-slice image stack (data in `/custom_built_brain_slice/`),
+  where conjugation-error correction is not required.\n\n2. **Calibration for a microscope
+  with possible conjugation and alignment issues (e.g., most commercial systems)**
+  \ \n   Process five calibration stacks, estimate conjugation errors, and apply those
+  corrections to generate an error-corrected SLM pattern.\n\n3. **In vivo imaging
+  with motion**  \n   Run NeAT on an in vivo mouse-brain image stack with sample motion.
+  If the samples do not require motion correction (e.g., zebrafish larvaes or plants)
+  but still need conjugation error correction, simply set `sample_motion = False`
+  and proceed with this step."
+tags:
+- adaptive optics
+- neural fields
+- machine learning
+- Fluorescence Microscopy
+- two-photon microscopy
+authors:
+- name: Iksung Kang
+  affiliations:
+  - name: University of California, Berkeley
+- name: Hyeonggeon Kim
+  affiliations:
+  - name: University of California, Berkeley
+- name: Ryan Natan
+  affiliations:
+  - name: University of California, Berkeley
+- name: Qinrong Zhang
+  affiliations:
+  - name: City University of Hong Kong
+- name: Stella X. Yu
+  affiliations:
+  - name: University of Michigan
+- name: Na Ji
+  affiliations:
+  - name: University of California, Berkeley

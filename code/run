@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -ex
+
+# ------------------------------------------------------------------------------------------------------------------
+# For custom-built microscopes, perfect optical conjugation assumed.
+python -u neat_learning.py -d custom_built_brain_slice --psf_dx 0.086 --psf_dy 0.086 --psf_dz 0.2 --cnts 50 200 200 --dims 50 200 200 --na_exc 1.1
+# ------------------------------------------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# For commercial microscopes: conjugation error estimation & correction required.
+# Step 1: Run NeAT on calibration image stacks (flat + 5 calibration patterns).
+python -u neat_learning.py -d commercial_beads_zeros --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+python -u neat_learning.py -d commercial_beads_mode4 --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+python -u neat_learning.py -d commercial_beads_mode6 --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+python -u neat_learning.py -d commercial_beads_mode8 --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+python -u neat_learning.py -d commercial_beads_mode9 --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+python -u neat_learning.py -d commercial_beads_mode13 --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 25 112 112 --na_exc 1.05
+
+# Step 2: Estimate conjugation error.
+python -u neat_conj_est.py --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --na_exc 1.05
+
+# Step 3: Correct conjugation error and generate aberration pattern for system aberration correction.
+python -u neat_conj_corr.py --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --na_exc 1.05 -d commercial_beads_zeros
+
+# Information for remaining image stacks:
+## /data/commercial_beads_Hinv_AO1/AVG_Tifs.tif - System aberration correction with H, AO iteration 1.
+## /data/commercial_beads_Hinv_AO2/AVG_Tifs.tif - System aberration correction with H, AO iteration 2.
+# ------------------------------------------------------------------------------------------------------------------
+
+
+# ------------------------------------------------------------------------------------------------------------------
+# Estimate aberration from an in vivo image stack and generate a conjugation-error-corrected aberration pattern.
+python -u neat_learning.py -d commercial_in_vivo --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --cnts 25 128 128 --dims 20 112 112 --na_exc 1.05 --sample_motion True
+python -u neat_conj_corr.py --psf_dx 0.125 --psf_dy 0.125 --psf_dz 0.2 --na_exc 1.05 -d commercial_in_vivo
+# ------------------------------------------------------------------------------------------------------------------
