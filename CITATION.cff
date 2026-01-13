@@ -17,6 +17,6 @@ authors:
   orcid: "https://orcid.org/0000-0002-5527-1663"
 title: "Adaptive optical correction for in vivo two-photon fluorescence microscopy with neural fields"
 version: 1.0
-// doi: 10.5281/zenodo.1234
+doi: 10.5281/zenodo.18227515
 date-released: 2026-01-13
 url: "https://github.com/iksungk/NeAT"
