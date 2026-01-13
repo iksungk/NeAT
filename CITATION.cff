@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Kang"
+  given-names: "Iksung"
+  orcid: "https://orcid.org/0000-0002-4009-6743"
+- family-names: "Kim"
+  given-names: "Hyeonggeon"
+- family-names: "Natan"
+  given-names: "Ryan"
+- family-names: "Zhang"
+  given-names: "Qinrong"
+- family-names: "Yu"
+  given-names: "Stella X."
+- family-names: "Ji"
+  given-names: "Na"
+  orcid: "https://orcid.org/0000-0002-5527-1663"
+title: "Adaptive optical correction for in vivo two-photon fluorescence microscopy with neural fields"
+version: 1.0
+// doi: 10.5281/zenodo.1234
+date-released: 2026-01-13
+url: "https://github.com/iksungk/NeAT"
