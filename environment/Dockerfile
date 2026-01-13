@@ -1,8 +1,3 @@
-# hash:sha256:4d448f835961c9c304deff24b35dc2351b4076e9e4d173407b01ed9e9081b44b
-FROM registry.codeocean.com/codeocean/lightning-jupyterlab-py39:1.0
-
-ARG DEBIAN_FRONTEND=noninteractive
-
 ENV HDF5_USE_FILE_LOCKING=FALSE
 
 RUN apt-get update \
