@@ -197,13 +197,12 @@ Learning process
 # Options (variable)
 have_sample_motion = args.sample_motion # adaptive reg
 feature_nominal_diameter = args.feature_nominal_diameter # px
-
+expect_power_attenuation_over_depth = True # if you expect some power attenuation over depth, e.g., brain slices, in vivo. For beads, you can keep it as False.
 
 # -----------------------------------------
 # Options (fixed)
 capture_stronger_aberration = True
 stronger_piecewise_smoothness = True
-expect_power_attenuation_over_depth = True
 # -----------------------------------------
 
 
